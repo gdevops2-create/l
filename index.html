@@ -1,240 +1,1204 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Ubuntu Terminal - C Program</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        * {
-            box-sizing: border-box;
+<title>IPC Lab Programs</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background: #080008;
+        color: #b8a8b8;
+        font-family: "Ubuntu Mono", "Courier New", monospace;
+        min-height: 100vh;
+        filter: brightness(0.72);
+    }
+
+    /* TERMINAL WINDOW */
+    .terminal {
+        width: 96%;
+        max-width: 1200px;
+        margin: 20px auto;
+        background: #170014;
+        border: 1px solid #45113f;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 35px rgba(120, 0, 100, 0.18);
+    }
+
+    /* TERMINAL TITLE BAR */
+    .titlebar {
+        height: 38px;
+        background: #250020;
+        border-bottom: 1px solid #46133f;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+
+    .dots {
+        display: flex;
+        gap: 7px;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #5b3155;
+    }
+
+    .terminal-title {
+        margin-left: 15px;
+        color: #a78ba5;
+        font-size: 13px;
+    }
+
+    /* TERMINAL BODY */
+    .terminal-body {
+        padding: 26px;
+    }
+
+    /* COMMAND LINE */
+    .command-line {
+        margin-bottom: 22px;
+        font-size: 18px;
+        line-height: 1.7;
+    }
+
+    .user {
+        color: #55ff00;
+        font-weight: bold;
+    }
+
+    .path {
+        color: #4da6ff;
+        font-weight: bold;
+    }
+
+    .command {
+        color: #d9c8d9;
+    }
+
+    .cursor {
+        color: #eeeeee;
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        50% {
+            opacity: 0;
+        }
+    }
+
+    /* SEARCH */
+    .search-box {
+        width: 100%;
+        background: #21001e;
+        border: 1px solid #71215f;
+        color: #ddd;
+        padding: 15px 18px;
+        border-radius: 5px;
+        outline: none;
+        font-family: inherit;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .search-box:focus {
+        border-color: #a33b91;
+        box-shadow: 0 0 8px rgba(163,59,145,0.15);
+    }
+
+    .search-box::placeholder {
+        color: #866f83;
+    }
+
+    /* PROGRAM COMMANDS */
+    .program-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #46133f;
+    }
+
+    .program-command {
+        background: #20001d;
+        border: 1px solid #6b2160;
+        color: #ddd;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 15px;
+        transition: 0.2s;
+    }
+
+    .program-command:hover {
+        background: #320029;
+        border-color: #a13c91;
+        color: white;
+    }
+
+    .program-command .dollar {
+        color: #55ff00;
+    }
+
+    .program-command.active {
+        background: #3a002f;
+        border-color: #a63c94;
+        color: white;
+    }
+
+    /* CONTENT */
+    #content {
+        padding-top: 32px;
+    }
+
+    .program {
+        display: none;
+        animation: appear 0.25s ease;
+    }
+
+    .program.active {
+        display: block;
+    }
+
+    @keyframes appear {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .program-heading {
+        font-size: 25px;
+        color: #ddd;
+        margin-bottom: 10px;
+    }
+
+    .description {
+        color: #a894a8;
+        font-family: Arial, sans-serif;
+        font-size: 15px;
+        margin-bottom: 22px;
+        line-height: 1.6;
+    }
+
+    /* TERMINAL COMMAND BOX */
+    .run-box {
+        background: #090909;
+        border: 1px solid #351c32;
+        padding: 18px;
+        margin: 18px 0;
+        border-radius: 4px;
+        overflow-x: auto;
+    }
+
+    .run-line {
+        color: #ddd;
+        line-height: 1.8;
+    }
+
+    .output {
+        color: #aaa;
+        margin-top: 8px;
+        white-space: pre-wrap;
+    }
+
+    /* CODE */
+    .code-title {
+        color: #c7b3c5;
+        margin: 22px 0 8px;
+        font-size: 16px;
+    }
+
+    pre {
+        background: #090909;
+        border: 1px solid #351c32;
+        border-radius: 4px;
+        padding: 20px;
+        overflow-x: auto;
+        color: #cfcfcf;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.55;
+    }
+
+    /* RESULT */
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        border-left: 3px solid #55aa55;
+        background: #100d10;
+        color: #aaa;
+    }
+
+    /* BACK TO TOP */
+    .top {
+        margin-top: 30px;
+        color: #777;
+        font-size: 13px;
+    }
+
+    .top a {
+        color: #7199c5;
+        text-decoration: none;
+    }
+
+    @media(max-width:700px) {
+        .terminal-body {
+            padding: 16px;
         }
 
-        body {
-            margin: 0;
-            background: #111;
-            font-family: "Ubuntu Mono", "Courier New", monospace;
-        }
-
-        /* Ubuntu Terminal Window */
-        .terminal {
-            width: 95%;
-            height: 92vh;
-            margin: 25px auto;
-            background: #300a24;
-            border-radius: 7px;
-            overflow: hidden;
-            box-shadow: 0 0 25px #000;
-        }
-
-        /* Top Ubuntu terminal bar */
-        .titlebar {
-            height: 42px;
-            background: #5c1747;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            color: white;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .button {
-            width: 13px;
-            height: 13px;
-            border-radius: 50%;
-        }
-
-        .red {
-            background: #ff5f56;
-        }
-
-        .yellow {
-            background: #ffbd2e;
-        }
-
-        .green {
-            background: #27c93f;
-        }
-
-        .title {
-            flex: 1;
-            text-align: center;
+        .command-line {
             font-size: 14px;
         }
 
-        /* Terminal screen */
-        .screen {
-            padding: 20px;
-            height: calc(100% - 42px);
-            overflow: auto;
-            background: #300a24;
-            color: white;
+        .program-heading {
+            font-size: 20px;
         }
 
-        .command {
-            font-size: 17px;
-            margin-bottom: 15px;
-        }
-
-        .user {
-            color: #55ff55;
-            font-weight: bold;
-        }
-
-        .path {
-            color: #55ff55;
-        }
-
-        .cursor {
-            color: white;
-        }
-
-        /* Code box */
-        textarea {
+        .program-command {
             width: 100%;
-            height: 470px;
-            background: #300a24;
-            color: #ffffff;
-            border: none;
-            outline: none;
-            resize: none;
-
-            font-family: "Ubuntu Mono",
-                         "Courier New",
-                         monospace;
-
-            font-size: 16px;
-            line-height: 1.45;
+            text-align: left;
         }
-
-        /* Buttons */
-        .controls {
-            margin-top: 10px;
-        }
-
-        button {
-            background: #300a24;
-            color: #55ff55;
-            border: 1px solid #55ff55;
-            padding: 8px 15px;
-            margin-right: 10px;
-
-            font-family: "Ubuntu Mono",
-                         "Courier New",
-                         monospace;
-
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #50113d;
-        }
-
-        #message {
-            margin-top: 12px;
-            color: #55ff55;
-            font-size: 15px;
-        }
-
-    </style>
+    }
+</style>
 </head>
 
 <body>
 
-<div class="terminal">
+<div class="terminal" id="top">
 
-    <!-- Ubuntu Terminal Header -->
+    <!-- TITLE BAR -->
     <div class="titlebar">
-
-        <div class="buttons">
-            <div class="button red"></div>
-            <div class="button yellow"></div>
-            <div class="button green"></div>
+        <div class="dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
         </div>
 
-        <div class="title">
-            thanush@linux: ~/Desktop/Learning
+        <div class="terminal-title">
+            thanush@linux: ~/MCA2/IPC
         </div>
-
     </div>
 
 
-    <!-- Terminal -->
-    <div class="screen">
+    <div class="terminal-body">
 
-        <div class="command">
-            <span class="user">thanush@linux</span>:<span class="path">~/Desktop/Learning</span>$ nano copy.c
+        <!-- COMMAND 1 -->
+        <div class="command-line">
+            <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+            <span class="command">./ipc-lab-programs</span>
         </div>
 
-        <textarea id="code">#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
+
+        <!-- SEARCH COMMAND -->
+        <div class="command-line">
+            <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+            <span class="command">search programs</span>
+        </div>
+
+
+        <!-- SEARCH -->
+        <input
+            type="text"
+            id="search"
+            class="search-box"
+            placeholder="Type program name... e.g. signal, pipe, TCP, shared memory"
+        >
+
+
+        <!-- PROGRAM NAVIGATION -->
+        <div class="program-list">
+
+            <button class="program-command active"
+                    onclick="showProgram(1)">
+                <span class="dollar">$</span> 1-file-copy
+            </button>
+
+            <button class="program-command"
+                    onclick="showProgram(2)">
+                <span class="dollar">$</span> 2-shell-script
+            </button>
+
+            <button class="program-command"
+                    onclick="showProgram(3)">
+                <span class="dollar">$</span> 3-zombie-orphan
+            </button>
+
+            <button class="program-command"
+                    onclick="showProgram(4)">
+                <span class="dollar">$</span> 4-signal
+            </button>
+
+            <button class="program-command"
+                    onclick="showProgram(5)">
+                <span class="dollar">$</span> 5-unnamed-pipe
+            </button>
+
+            <button class="program-command"
+                    onclick="showProgram(6)">
+                <span class="dollar">$</span> 6-named-pipe
+            </button>
+
+            <button class="program-command"
+                    onclick="showProgram(7)">
+                <span class="dollar">$</span> 7-shared-memory
+            </button>
+
+            <button class="program-command"
+                    onclick="showProgram(8)">
+                <span class="dollar">$</span> 8-tcp
+            </button>
+
+        </div>
+
+
+        <!-- PROGRAM CONTENT -->
+        <div id="content">
+
+
+            <!-- ================= PROGRAM 1 ================= -->
+
+            <section class="program active" id="program1">
+
+                <div class="program-heading">
+                    <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+                    ./file-copy
+                </div>
+
+                <div class="description">
+                    Program 1 - Copy contents from one file to another using
+                    system calls.
+                </div>
+
+                <div class="run-box">
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc file1.c -o file1
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./file1
+                    </div>
+
+                    <div class="output">
+File copied successfully.
+                    </div>
+                </div>
+
+                <div class="code-title">file1.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
 
 int main()
 {
     int source, destination;
     char buffer[100];
-    int n;
 
     source = open("source.txt", O_RDONLY);
-
     destination = open("destination.txt",
-                       O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                       O_WRONLY | O_CREAT, 0644);
 
-    while ((n = read(source, buffer, sizeof(buffer))) > 0)
-    {
-        write(destination, buffer, n);
-    }
+    int n = read(source, buffer, sizeof(buffer));
+
+    write(destination, buffer, n);
+
+    printf("File copied successfully.\n");
 
     close(source);
     close(destination);
 
-    printf("File copied successfully!\n");
+    return 0;
+}</code></pre>
+
+                <div class="result">
+                    Result: File copied successfully.
+                </div>
+
+            </section>
+
+
+            <!-- ================= PROGRAM 2 ================= -->
+
+            <section class="program" id="program2">
+
+                <div class="program-heading">
+                    <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+                    ./shell-script
+                </div>
+
+                <div class="description">
+                    Program 2 - Shell script to list all files and
+                    subdirectories in a given directory.
+                </div>
+
+                <div class="run-box">
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        nano list.sh
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        chmod +x list.sh
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./list.sh
+                    </div>
+
+                    <div class="output">
+Enter the directory path:
+Files and subdirectories:
+file1.c
+file2.c
+programs
+output.txt
+                    </div>
+
+                </div>
+
+                <div class="code-title">list.sh</div>
+
+<pre><code>#!/bin/bash
+
+echo "Enter the directory path:"
+read dir
+
+if [ -d "$dir" ]
+then
+    echo "Files and subdirectories in $dir:"
+    ls -la "$dir"
+else
+    echo "Directory does not exist."
+fi</code></pre>
+
+                <div class="result">
+                    Result: All files and subdirectories are displayed.
+                </div>
+
+            </section>
+
+
+            <!-- ================= PROGRAM 3 ================= -->
+
+            <section class="program" id="program3">
+
+                <div class="program-heading">
+                    <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+                    ./zombie-orphan
+                </div>
+
+                <div class="description">
+                    Program 3 - Process creation using fork() to demonstrate
+                    Zombie and Orphan processes.
+                </div>
+
+                <div class="run-box">
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc zombie.c -o zombie
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./zombie
+                    </div>
+
+                    <div class="output">
+Child process
+Child PID = 17440
+Parent process
+Parent PID = 17439
+Parent completed
+                    </div>
+
+                </div>
+
+                <div class="code-title">zombie.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main()
+{
+    pid_t pid;
+
+    pid = fork();
+
+    if (pid &lt; 0)
+    {
+        printf("Fork failed\n");
+    }
+    else if (pid == 0)
+    {
+        printf("Child process\n");
+        printf("Child PID = %d\n", getpid());
+        exit(0);
+    }
+    else
+    {
+        printf("Parent process\n");
+        printf("Parent PID = %d\n", getpid());
+
+        sleep(10);
+
+        printf("Parent completed\n");
+    }
 
     return 0;
-}</textarea>
+}</code></pre>
 
-        <div class="controls">
+                <div class="code-title">Orphan process</div>
 
-            <button onclick="copyCode()">
-                Copy Code
-            </button>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
 
-            <button onclick="showCompile()">
-                Compile
-            </button>
+int main()
+{
+    pid_t pid;
+
+    pid = fork();
+
+    if (pid &lt; 0)
+    {
+        printf("Fork failed\n");
+    }
+    else if (pid == 0)
+    {
+        sleep(5);
+
+        printf("Child process\n");
+        printf("Child PID = %d\n", getpid());
+        printf("New Parent PID = %d\n", getppid());
+    }
+    else
+    {
+        printf("Parent process\n");
+        printf("Parent PID = %d\n", getpid());
+        exit(0);
+    }
+
+    return 0;
+}</code></pre>
+
+            </section>
+
+
+            <!-- ================= PROGRAM 4 ================= -->
+
+            <section class="program" id="program4">
+
+                <div class="program-heading">
+                    <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+                    ./signal
+                </div>
+
+                <div class="description">
+                    Program 4 - Demonstration of signal handling using
+                    signal() and SIGINT.
+                </div>
+
+                <div class="run-box">
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc signal.c -o signal
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./signal
+                    </div>
+
+                    <div class="output">
+Program started.
+Press Ctrl+C to generate SIGINT.
+Program is running...
+Program is running...
+Program is running...
+^C
+SIGINT signal received!
+Signal handled successfully.
+Program is running...
+                    </div>
+
+                </div>
+
+                <div class="code-title">signal.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;signal.h&gt;
+
+void handle_signal(int sig)
+{
+    printf("\nSIGINT signal received!\n");
+    printf("Signal handled successfully.\n");
+}
+
+int main()
+{
+    signal(SIGINT, handle_signal);
+
+    printf("Program started.\n");
+    printf("Press Ctrl+C to generate SIGINT.\n");
+
+    while(1)
+    {
+        printf("Program is running...\n");
+        sleep(2);
+    }
+
+    return 0;
+}</code></pre>
+
+                <div class="result">
+                    Result: SIGINT signal is successfully handled.
+                </div>
+
+            </section>
+
+
+            <!-- ================= PROGRAM 5 ================= -->
+
+            <section class="program" id="program5">
+
+                <div class="program-heading">
+                    <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+                    ./unnamed-pipe
+                </div>
+
+                <div class="description">
+                    Program 5 - Communication between two processes using
+                    an unnamed pipe.
+                </div>
+
+                <div class="run-box">
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc unnamed.c -o unnamed
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./unnamed
+                    </div>
+
+                    <div class="output">
+Parent sent: Hello from Parent
+Child received: Hello from Parent
+                    </div>
+
+                </div>
+
+                <div class="code-title">unnamed.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;string.h&gt;
+
+int main()
+{
+    int fd[2];
+    pid_t pid;
+
+    char message[] = "Hello from Parent";
+    char buffer[100];
+
+    pipe(fd);
+
+    pid = fork();
+
+    if(pid == 0)
+    {
+        close(fd[1]);
+
+        read(fd[0], buffer, sizeof(buffer));
+
+        printf("Child received: %s\n", buffer);
+
+        close(fd[0]);
+    }
+    else
+    {
+        close(fd[0]);
+
+        write(fd[1], message, strlen(message) + 1);
+
+        printf("Parent sent: %s\n", message);
+
+        close(fd[1]);
+    }
+
+    return 0;
+}</code></pre>
+
+                <div class="result">
+                    Result: Parent and child processes successfully communicated
+                    using an unnamed pipe.
+                </div>
+
+            </section>
+
+
+            <!-- ================= PROGRAM 6 ================= -->
+
+            <section class="program" id="program6">
+
+                <div class="program-heading">
+                    <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+                    ./named-pipe
+                </div>
+
+                <div class="description">
+                    Program 6 - Communication between unrelated processes
+                    using a Named Pipe (FIFO).
+                </div>
+
+                <div class="run-box">
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc writer.c -o writer
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc reader.c -o reader
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./writer
+                    </div>
+
+                    <div class="output">
+Writer sent: Hello from Writer Process
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./reader
+                    </div>
+
+                    <div class="output">
+Reader received: Hello from Writer Process
+                    </div>
+
+                </div>
+
+                <div class="code-title">writer.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;string.h&gt;
+
+int main()
+{
+    int fd;
+
+    char message[] = "Hello from Writer Process";
+
+    mkfifo("myfifo", 0666);
+
+    fd = open("myfifo", O_WRONLY);
+
+    write(fd, message, strlen(message) + 1);
+
+    printf("Writer sent: %s\n", message);
+
+    close(fd);
+
+    return 0;
+}</code></pre>
+
+                <div class="code-title">reader.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+
+int main()
+{
+    int fd;
+    char buffer[100];
+
+    fd = open("myfifo", O_RDONLY);
+
+    read(fd, buffer, sizeof(buffer));
+
+    printf("Reader received: %s\n", buffer);
+
+    close(fd);
+
+    return 0;
+}</code></pre>
+
+            </section>
+
+
+            <!-- ================= PROGRAM 7 ================= -->
+
+            <section class="program" id="program7">
+
+                <div class="program-heading">
+                    <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+                    ./shared-memory
+                </div>
+
+                <div class="description">
+                    Program 7 - Communication between two processes using
+                    shared memory.
+                </div>
+
+                <div class="run-box">
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc shared_memory.c -o shared_memory
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./shared_memory
+                    </div>
+
+                    <div class="output">
+Parent sent: Hello from Parent
+Child received: Hello from Parent
+                    </div>
+
+                </div>
+
+                <div class="code-title">shared_memory.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/ipc.h&gt;
+#include &lt;sys/shm.h&gt;
+#include &lt;sys/wait.h&gt;
+
+int main()
+{
+    int shmid;
+    char *shared_memory;
+
+    shmid = shmget(1234, 1024, IPC_CREAT | 0666);
+
+    if(shmid &lt; 0)
+    {
+        printf("Shared memory creation failed\n");
+        exit(1);
+    }
+
+    shared_memory = (char *)shmat(shmid, NULL, 0);
+
+    if(shared_memory == (char *)-1)
+    {
+        printf("Shared memory attachment failed\n");
+        exit(1);
+    }
+
+    if(fork() == 0)
+    {
+        sleep(1);
+
+        printf("Child received: %s\n", shared_memory);
+
+        shmdt(shared_memory);
+    }
+    else
+    {
+        strcpy(shared_memory, "Hello from Parent");
+
+        printf("Parent sent: %s\n", shared_memory);
+
+        wait(NULL);
+
+        shmdt(shared_memory);
+
+        shmctl(shmid, IPC_RMID, NULL);
+    }
+
+    return 0;
+}</code></pre>
+
+            </section>
+
+
+            <!-- ================= PROGRAM 8 ================= -->
+
+            <section class="program" id="program8">
+
+                <div class="program-heading">
+                    <span class="user">thanush@linux</span>:<span class="path">~/MCA2/IPC</span>$ 
+                    ./tcp
+                </div>
+
+                <div class="description">
+                    Program 8 - TCP client-server program for message exchange
+                    using socket programming.
+                </div>
+
+                <div class="run-box">
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc tcpserver.c -o tcpserver
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        gcc tcpclient.c -o tcpclient
+                    </div>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./tcpserver
+                    </div>
+
+                    <div class="output">
+Server waiting for client...
+Client says: Hello from Client
+Server sent: Hello from Server
+                    </div>
+
+                    <br>
+
+                    <div class="run-line">
+                        <span class="user">thanush@linux</span>:~/MCA2/IPC$ 
+                        ./tcpclient
+                    </div>
+
+                    <div class="output">
+Client sent: Hello from Client
+Server says: Hello from Server
+                    </div>
+
+                </div>
+
+                <div class="code-title">tcpserver.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;arpa/inet.h&gt;
+
+int main()
+{
+    int server_socket, client_socket;
+
+    struct sockaddr_in server, client;
+
+    socklen_t client_len = sizeof(client);
+
+    char buffer[100];
+
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons(8080);
+
+    bind(server_socket,
+         (struct sockaddr *)&amp;server,
+         sizeof(server));
+
+    listen(server_socket, 5);
+
+    printf("Server waiting for client...\n");
+
+    client_socket = accept(
+        server_socket,
+        (struct sockaddr *)&amp;client,
+        &amp;client_len
+    );
+
+    read(client_socket, buffer, sizeof(buffer));
+
+    printf("Client says: %s\n", buffer);
+
+    strcpy(buffer, "Hello from Server");
+
+    write(client_socket,
+          buffer,
+          strlen(buffer) + 1);
+
+    printf("Server sent: %s\n", buffer);
+
+    close(client_socket);
+    close(server_socket);
+
+    return 0;
+}</code></pre>
+
+
+                <div class="code-title">tcpclient.c</div>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;arpa/inet.h&gt;
+
+int main()
+{
+    int client_socket;
+
+    struct sockaddr_in server;
+
+    char buffer[100];
+
+    client_socket = socket(
+        AF_INET,
+        SOCK_STREAM,
+        0
+    );
+
+    server.sin_family = AF_INET;
+    server.sin_port = htons(8080);
+    server.sin_addr.s_addr =
+        inet_addr("127.0.0.1");
+
+    connect(
+        client_socket,
+        (struct sockaddr *)&amp;server,
+        sizeof(server)
+    );
+
+    strcpy(buffer, "Hello from Client");
+
+    write(
+        client_socket,
+        buffer,
+        strlen(buffer) + 1
+    );
+
+    printf("Client sent: %s\n", buffer);
+
+    read(
+        client_socket,
+        buffer,
+        sizeof(buffer)
+    );
+
+    printf("Server says: %s\n", buffer);
+
+    close(client_socket);
+
+    return 0;
+}</code></pre>
+
+            </section>
+
 
         </div>
 
-        <div id="message"></div>
+
+        <div class="top">
+            <a href="#top">↑ back to terminal top</a>
+        </div>
 
     </div>
-
 </div>
 
 
 <script>
 
-function copyCode()
-{
-    let code = document.getElementById("code").value;
+    /* SHOW PROGRAM */
 
-    navigator.clipboard.writeText(code);
+    function showProgram(number) {
 
-    document.getElementById("message").innerHTML =
-        "thanush@linux:~/Desktop/Learning$ Code copied successfully!";
-}
+        /* Hide all programs */
+        document.querySelectorAll(".program").forEach(function(program) {
+            program.classList.remove("active");
+        });
+
+        /* Remove active navigation */
+        document.querySelectorAll(".program-command").forEach(function(button) {
+            button.classList.remove("active");
+        });
+
+        /* Show selected program */
+        const selected = document.getElementById("program" + number);
+
+        if(selected) {
+            selected.classList.add("active");
+        }
+
+        /* Activate clicked button */
+        const buttons = document.querySelectorAll(".program-command");
+
+        if(buttons[number - 1]) {
+            buttons[number - 1].classList.add("active");
+        }
+
+        /* Move to program */
+        document.getElementById("content").scrollIntoView({
+            behavior: "smooth"
+        });
+    }
 
 
-function showCompile()
-{
-    document.getElementById("message").innerHTML =
-        "thanush@linux:~/Desktop/Learning$ gcc copy.c -o copy<br>" +
-        "thanush@linux:~/Desktop/Learning$ ./copy";
-}
+    /* SEARCH */
+
+    const search = document.getElementById("search");
+
+    search.addEventListener("input", function() {
+
+        const value = search.value.toLowerCase().trim();
+
+        const programs = document.querySelectorAll(".program");
+
+        programs.forEach(function(program) {
+
+            const text = program.innerText.toLowerCase();
+
+            if(value === "" || text.includes(value)) {
+                program.style.display = "";
+            }
+            else {
+                program.style.display = "none";
+            }
+
+        });
+
+    });
 
 </script>
 
