@@ -1,50 +1,177 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>C Program</title>
+    <title>Ubuntu Terminal - C Program</title>
 
     <style>
-        body {
-            font-family: Arial;
-            background: #f2f2f2;
-            padding: 30px;
-        }
-
-        .box {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 500px;
-            font-family: monospace;
-            font-size: 15px;
-            padding: 10px;
+        * {
             box-sizing: border-box;
         }
 
-        button {
-            margin-top: 10px;
-            padding: 12px 25px;
+        body {
+            margin: 0;
+            background: #111;
+            font-family: "Ubuntu Mono", "Courier New", monospace;
+        }
+
+        /* Ubuntu Terminal Window */
+        .terminal {
+            width: 95%;
+            height: 92vh;
+            margin: 25px auto;
+            background: #300a24;
+            border-radius: 7px;
+            overflow: hidden;
+            box-shadow: 0 0 25px #000;
+        }
+
+        /* Top Ubuntu terminal bar */
+        .titlebar {
+            height: 42px;
+            background: #5c1747;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            color: white;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .button {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+        }
+
+        .red {
+            background: #ff5f56;
+        }
+
+        .yellow {
+            background: #ffbd2e;
+        }
+
+        .green {
+            background: #27c93f;
+        }
+
+        .title {
+            flex: 1;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        /* Terminal screen */
+        .screen {
+            padding: 20px;
+            height: calc(100% - 42px);
+            overflow: auto;
+            background: #300a24;
+            color: white;
+        }
+
+        .command {
+            font-size: 17px;
+            margin-bottom: 15px;
+        }
+
+        .user {
+            color: #55ff55;
+            font-weight: bold;
+        }
+
+        .path {
+            color: #55ff55;
+        }
+
+        .cursor {
+            color: white;
+        }
+
+        /* Code box */
+        textarea {
+            width: 100%;
+            height: 470px;
+            background: #300a24;
+            color: #ffffff;
+            border: none;
+            outline: none;
+            resize: none;
+
+            font-family: "Ubuntu Mono",
+                         "Courier New",
+                         monospace;
+
             font-size: 16px;
+            line-height: 1.45;
+        }
+
+        /* Buttons */
+        .controls {
+            margin-top: 10px;
+        }
+
+        button {
+            background: #300a24;
+            color: #55ff55;
+            border: 1px solid #55ff55;
+            padding: 8px 15px;
+            margin-right: 10px;
+
+            font-family: "Ubuntu Mono",
+                         "Courier New",
+                         monospace;
+
+            font-size: 15px;
             cursor: pointer;
         }
+
+        button:hover {
+            background: #50113d;
+        }
+
+        #message {
+            margin-top: 12px;
+            color: #55ff55;
+            font-size: 15px;
+        }
+
     </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="terminal">
 
-    <h2>File Copy Program in C</h2>
+    <!-- Ubuntu Terminal Header -->
+    <div class="titlebar">
 
-    <textarea id="code">#include &lt;stdio.h&gt;
-#include &lt;fcntl.h&gt;
-#include &lt;unistd.h&gt;
+        <div class="buttons">
+            <div class="button red"></div>
+            <div class="button yellow"></div>
+            <div class="button green"></div>
+        </div>
+
+        <div class="title">
+            thanush@linux: ~/Desktop/Learning
+        </div>
+
+    </div>
+
+
+    <!-- Terminal -->
+    <div class="screen">
+
+        <div class="command">
+            <span class="user">thanush@linux</span>:<span class="path">~/Desktop/Learning</span>$ nano copy.c
+        </div>
+
+        <textarea id="code">#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 int main()
 {
@@ -70,21 +197,43 @@ int main()
     return 0;
 }</textarea>
 
-    <button onclick="copyCode()">Copy Code</button>
+        <div class="controls">
+
+            <button onclick="copyCode()">
+                Copy Code
+            </button>
+
+            <button onclick="showCompile()">
+                Compile
+            </button>
+
+        </div>
+
+        <div id="message"></div>
+
+    </div>
 
 </div>
+
 
 <script>
 
 function copyCode()
 {
-    let code = document.getElementById("code");
+    let code = document.getElementById("code").value;
 
-    code.select();
+    navigator.clipboard.writeText(code);
 
-    navigator.clipboard.writeText(code.value);
+    document.getElementById("message").innerHTML =
+        "thanush@linux:~/Desktop/Learning$ Code copied successfully!";
+}
 
-    alert("Code copied!");
+
+function showCompile()
+{
+    document.getElementById("message").innerHTML =
+        "thanush@linux:~/Desktop/Learning$ gcc copy.c -o copy<br>" +
+        "thanush@linux:~/Desktop/Learning$ ./copy";
 }
 
 </script>
