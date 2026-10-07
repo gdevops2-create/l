@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>C Program</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            padding: 30px;
+        }
+
+        .box {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 500px;
+            font-family: monospace;
+            font-size: 15px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h2>File Copy Program in C</h2>
+
+    <textarea id="code">#include &lt;stdio.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+
+int main()
+{
+    int source, destination;
+    char buffer[100];
+    int n;
+
+    source = open("source.txt", O_RDONLY);
+
+    destination = open("destination.txt",
+                       O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+    while ((n = read(source, buffer, sizeof(buffer))) > 0)
+    {
+        write(destination, buffer, n);
+    }
+
+    close(source);
+    close(destination);
+
+    printf("File copied successfully!\n");
+
+    return 0;
+}</textarea>
+
+    <button onclick="copyCode()">Copy Code</button>
+
+</div>
+
+<script>
+
+function copyCode()
+{
+    let code = document.getElementById("code");
+
+    code.select();
+
+    navigator.clipboard.writeText(code.value);
+
+    alert("Code copied!");
+}
+
+</script>
+
+</body>
+</html>
